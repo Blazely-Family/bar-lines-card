@@ -8,7 +8,7 @@
  * it. See README.md for the config reference.
  */
 
-const VERSION = "0.1.2";
+const VERSION = "0.1.3";
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -166,7 +166,10 @@ class BarLinesCard extends HTMLElement {
 
 const STYLE = `
 :host { display: block; height: 100%; }
-ha-card { height: 100%; box-sizing: border-box; padding: 8px 12px; overflow: visible; }
+/* The theme's glass tint (Frosted Glass sets --ha-card-glass-tint, which the
+   wall panel screensaver deepens), drawn by the card itself so it doesn't depend
+   on the theme's card-mod styles reaching this card. Other themes: their card background. */
+ha-card { height: 100%; box-sizing: border-box; padding: 8px 12px; overflow: visible; background: var(--ha-card-glass-tint, var(--ha-card-background, var(--card-background-color))); }
 ha-card.bare { padding: 0; background: none !important; border: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 ha-card.bare::before, ha-card.bare::after { display: none !important; }
 ${BAR_STYLE}`;
