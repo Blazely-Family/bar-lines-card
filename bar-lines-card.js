@@ -8,7 +8,7 @@
  * it. See README.md for the config reference.
  */
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -110,9 +110,12 @@ class BarLinesCard extends HTMLElement {
   setConfig(config) {
     if (!config || !Array.isArray(config.bars)) throw new Error("bar-lines-card: `bars` must be a list");
     this._cfg = config;
+    this._config = config; // where card-mod/UIX look for a card's config
     this._sig = null;
     if (!this.shadowRoot) {
-      this.attachShadow({ mode: "open" });
+      // One ha-card for the card's lifetime, so styles that themes and
+      // card-mod/UIX inject into it survive re-renders.
+      this.attachShadow({ mode: "open" }).innerHTML = `<style>${STYLE}</style><ha-card></ha-card>`;
       this.shadowRoot.addEventListener("click", (ev) => {
         const blk = ev.composedPath().find((n) => n.dataset && n.dataset.entity);
         if (blk) moreInfo(this, blk.dataset.entity);
@@ -153,8 +156,9 @@ class BarLinesCard extends HTMLElement {
     if (!force && html === this._sig) return;
     this._sig = html;
     // `card: false` drops the card chrome and padding, for use inside another card.
-    const bare = this._cfg.card === false ? " bare" : "";
-    this.shadowRoot.innerHTML = `<style>${STYLE}</style><ha-card class="${bare.trim()}">${html}</ha-card>`;
+    const card = this.shadowRoot.querySelector("ha-card");
+    card.className = this._cfg.card === false ? "bare" : "";
+    card.innerHTML = html;
   }
 }
 
